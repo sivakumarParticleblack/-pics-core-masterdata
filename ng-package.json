@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../../dist/pics-core/masterdata",
+  "assets": ["./assets"],
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  }
+}

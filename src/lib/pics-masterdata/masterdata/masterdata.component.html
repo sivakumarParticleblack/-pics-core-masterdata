@@ -1,0 +1,275 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/23.2.3/css/dx.material.blue.light.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha384-dfST6o4eMl42MOv72d7aMR3zdTtiErUq6nhB65eA6ATlFAq1RfiaDJt9FCx0X1o5" crossorigin="anonymous">
+  <style>
+    .wide-input {
+      width: 100%;
+    }
+  </style>
+</head>
+<app-alert></app-alert>
+<div class="permission">
+  <div class="row">
+    <div class="col-lg-4 col-md-6 col-12">
+      <div class="clearfix"></div>
+      <div class="tab-content py-2">
+        <div class="tab-pane fade show active">
+          <div class="row">
+          <div class="col-md-10 col-12 form-group bgiconsearch pr-1">
+            <span class="p-input-icon-right w-100">
+              <i class="pi pi-times-circle" (click)="clearSearch()"></i>
+              <input class="form-control" placeholder="Search by Category name" type="text" (keyup)="searchMaster($event)"
+                fieldKey="SETTINGS_MAS_SEARCH_BY_NAME" pInputText />
+            </span>
+          </div>
+          <div class="col-md-2 col-12 form-group pl-0 text-md-right">
+            <button type="button" class="btn btn-primary btncommon" (click)="onClickAddCategory()">Add</button>
+            <!-- <button type="button" class="btn btn-primary btncommon" (click)="onClickAddCategory()">+</button> -->
+          </div>
+        </div>
+          <div class="clearfix"></div>
+          <div class="masteracess">
+            <p-tree [value]="filterMasterList" selectionMode="single" [(selection)]="selectedItem"
+              (onNodeSelect)="nodeSelect($event)">
+            </p-tree>
+
+              <!-- [contextMenu]="treeContextMenu">
+             (onNodeContextMenuSelect)="onNodeContextMenuSelect($event)" -->
+            <p-contextMenu #treeContextMenu [model]="menuItems" appendTo="body"></p-contextMenu>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8 col-md-6 col-12 master-right mt-2">
+      <p-confirmPopup></p-confirmPopup>
+      <p-card id="categoryForm" class="rbac-card" [formGroup]="categoryForm"
+        [style]="{ width: '100%', 'margin-bottom': '1em' }">
+
+        <input id="cid" type="hidden" formControlName="id" />
+        <input id="capplicationid" type="hidden" formControlName="applicationid" />
+
+        <div class="p-fluid p-formgrid p-grid">
+          <div class="col-md-12 col-12 mb-3">
+            <div class="strip_head toggleleft m-0 p-0">
+              <span class="report_head font-weight-bold">{{saveMode === 'INSERT' ? 'Add Category' : 'Update Category'}}</span>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-12 col-12 mb-3">
+            <label for="mName" class="referral-form-labels">Name
+              <span class="requiredfield text-danger">*</span>
+            </label>
+            <input id="mName" type="text" formControlName="name" fieldKey="SETTINGS_MAS_NAME" placeholder="Enter Name" aria-describedby="mName"
+             (input)="onInput($event, 'name', 'Category Name', true)" pInputText class="wide-input" />
+             <div *ngIf="validationErrors['Category Name']" class="p-error block mt-1">{{validationErrors['Category Name']}}</div>
+            <!-- <div *ngIf="
+             categoryForm.controls['name'].invalid &&
+             categoryForm.controls['name'].dirty &&
+            !categoryForm.controls['name'].hasError('required')">
+            <small *ngIf="categoryForm.controls['name'].errors && categoryForm.controls['name'].invalid"
+              class="p-error block">Invalid input data</small>
+           </div> -->
+           <div *ngIf="!validationErrors['Category Name'] && 
+           categoryForm.controls['name'].invalid &&
+           categoryForm.controls['name'].hasError('required') && categoryForm.controls['name'].errors && formSubmit">
+            <div *ngIf="categoryForm.controls['name'].hasError('required')" class="p-error block mt-1">Category Name is
+              required</div>
+           </div>
+          </div>
+          <div class="col-lg-6 col-md-12 col-12 mb-3">
+            <label for="cdescription" class="referral-form-labels">Description </label>
+            <input id="cdescription" type="text" formControlName="description" fieldKey="SETTINGS_MAS_DESCRYPTION"
+              placeholder="Enter Description" aria-describedby="cdescription"
+              (input)="onInput($event, 'description', 'Description', false)"pInputText />
+              <div *ngIf="validationErrors['Description']" class="p-error block mt-1">{{validationErrors['Description']}}</div>
+              <!-- maxlength="200" pattern="[a-zA-Z0-9\s,.\-_]*" <div *ngIf="
+              categoryForm.controls['description'].invalid &&
+              categoryForm.controls['description'].dirty &&
+              !categoryForm.controls['description'].hasError('required')">
+              <small *ngIf="categoryForm.controls['description'].errors && categoryForm.controls['description'].invalid"
+                class="p-error block">Invalid input data</small>
+            </div> -->
+          </div>
+          <!-- <div class="col-lg-3 col-md-12 col-12 mb-3">
+            <label for="corder" class="referral-form-labels d-none d-lg-inline-block">&#160;</label>
+            <div>
+              <p-checkbox st inputId="readOnly" [binary]="true" formControlName="readonly"
+                fieldKey="SETTINGS_MAS_READ_ONLY" label="Readonly">
+              </p-checkbox>
+            </div>
+          </div> -->
+          <div class="col-lg-3 col-md-12 col-12 mb-3">
+            <label for="corder" class="referral-form-labels d-none d-lg-inline-block">&#160;</label>
+            <div class="d-flex align-items-center" style="height: 32px;">
+              <p-checkbox st inputId="active" [binary]="true" formControlName="isenabled" fieldKey="SETTINGS_MAS_ACTIVE"
+                label="Active"></p-checkbox>
+            </div>
+          </div>
+        </div>
+       <div class="mt-2 text-right">
+        <!-- <button fieldKey="SETTINGS_MAS_CANCEL" class="pull-right mb-2 btn btn-danger" (click)="onClickdeleteCategory()"
+            *ngIf="saveMode === 'UPDATE'">
+            Delete
+          </button> -->
+          <div></div>
+          <button class="mb-2 btn btn-danger"
+            fieldKey="SETTINGS_MAS_CANCEL" (click)="onClickdeleteCategory()"  *ngIf="saveMode === 'UPDATE'">
+            Delete
+          </button>
+          <button class="mb-2 btn bg-white text-primary border border-primary btncancel"
+            fieldKey="SETTINGS_MAS_CANCEL" (click)="clearCategory()">
+            Cancel
+          </button>
+          <button class="mb-2 btn btn-primary btncommon" fieldKey="SETTINGS_MAS_ADD_CATOGORY"
+            (click)="saveCategory()">
+            {{ saveMode === 'UPDATE' ? 'Update' : 'Save' }}
+          </button>
+        </div>
+      </p-card>
+<!-- pcard -->
+
+<div id="tree-list-demo" *ngIf="selectedCategoryId != '' ">
+  <style>
+    /* Add row borders */
+    #lookuptasks .dx-datagrid-rowsview .dx-row {
+      border-bottom: 1px solid #ddd; /* Adjust the border color as needed */
+    }
+
+    /* Make column names bold */
+    #lookuptasks .dx-header-row .dx-header-cell {
+      font-weight: bold;
+    }
+
+    #searchpanel .dx-datagrid-search-panel {
+    margin-left: 0px;
+    padding-left: 0px;
+    }
+  </style>
+
+    <!-- <div class="tab-container">
+      <div class="tab-button" [class.active]="isEditMode" (click)="toggleEditMode()">
+        <i class="fas fa-edit"></i> Edit
+      </div>
+      <div class="tab-button" [class.active]="!isEditMode" (click)="toggleReorderMode()">
+        <i class="fas fa-sort"></i> Reorder
+      </div>
+    </div> -->
+    <!-- <dx-tabs [dataSource]="Tabs" [(selectedItem)]="selectedTab" (onItemClick)="handleTabClick($event)">
+    </dx-tabs> -->
+    <!-- <div class="sort-options" *ngIf="isReorderMode">
+      <label for="sortOrder">Sort Order:</label>
+      <select id="sortOrder" [(ngModel)]="selectedSortOrder" (ngModelChange)="sortGrid(selectedSortOrder)">
+        <option value="asc">ASC</option>
+        <option value="desc">DESC</option>
+      </select>
+    </div> -->
+    <p-tabView #tabView [(activeIndex)]="activeTabIndex" (onChange)="onTabChange($event)">
+      <p-tabPanel header="Edit">
+          <!-- Content for the Edit tab -->
+      </p-tabPanel>
+      <p-tabPanel header="Reorder">
+          <!-- Content for the Reorder tab -->
+      </p-tabPanel>
+    </p-tabView>
+    <div class="sort-options col-lg-3 col-md-12 col-12 mb-3" *ngIf="isReorderMode">
+      <form [formGroup]="categoryForm">
+        <p-dropdown
+          [options]="sortOrder"
+          placeholder="Select a Order"
+          formControlName="lookuporder"
+          optionLabel="name"
+          optionValue="value"
+          styleClass="icon-dropdown"
+          (onChange)="sortGrid($event.value)">
+        </p-dropdown>
+      </form>
+  </div>
+  <dx-tree-list
+    id="lookuptasks"
+    [dataSource]="tasksData"
+    keyExpr="id"
+    parentIdExpr="parentid"
+    [columnAutoWidth]="true"
+    [wordWrapEnabled]="true"
+    [showBorders]="true"
+    (onInitNewRow)="initNewRow($event)"
+    (onSaving)="saveChanges($event)"
+    (onCellPrepared)="onCellPrepared($event)"
+    (onEditCanceled)="onEditCanceled($event)"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
+    (onRowValidating)="onRowValidating($event)"
+  >
+   <dxo-sorting mode="none"></dxo-sorting>
+   <dxo-search-panel id="searchpanel" class="dx-datagrid-search-panel " [visible]="isEditMode" [width]="300" [style]="{ 'position': 'absolute', 'left': '0' }"></dxo-search-panel>
+    <dxo-editing
+    mode="batch"
+    [allowAdding]="isEditMode"
+    [allowUpdating]="isEditMode"
+    [allowDeleting]="isEditMode"
+    [useIcons]="true">
+    </dxo-editing>
+    <dxo-row-dragging
+    [allowReordering]="!isEditMode"
+    [onReorder]="onReorder"
+    [showDragIcons]="false">
+    </dxo-row-dragging>
+    <dxo-header-filter>
+      <style>
+        /* Make column names bold */
+        #lookuptasks .dx-header-row .dx-header-cell {
+          font-weight: bold;
+        }
+      </style>
+    </dxo-header-filter>
+
+    <dxi-column class="dx-header-row" dataField="key" caption="Key" [minWidth]="200"  [maxWidth]="200">
+      <div class="required-header">
+        Key<span class="required-marker">*</span>
+    </div>
+      <dxi-validation-rule type="required" message="Key is required"></dxi-validation-rule>
+      <dxi-validation-rule type="pattern" [pattern]="pattern" message="Allowed input - Alpha numeric, hyphen, underscore and space."></dxi-validation-rule>
+      <dxi-validation-rule type="stringLength" [max]="50" message="Key limit - 50 characters"></dxi-validation-rule>
+      <dxi-validation-rule type="custom" [validationCallback]="checkKeyDuplicate" message="Key Already Exists"></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column class="dx-header-row" dataField="value" caption="Value" [minWidth]="250" [maxWidth]="250">
+      <dxi-validation-rule type="required" message="value is required"></dxi-validation-rule>
+      <!-- <dxi-validation-rule type="pattern"  [pattern]="pattern" message="Invalid Input data"></dxi-validation-rule>    -->
+      <dxi-validation-rule type="stringLength" [max]="250" message="value limit - 250 characters"></dxi-validation-rule>
+      <dxi-validation-rule type="custom" [validationCallback]="checkValueDuplicate" message="Value Already Exists"></dxi-validation-rule>
+    </dxi-column>
+
+   <!-- <dxi-column class="dx-header-row" dataField="order" caption="Order"  [maxlength]= "3" [minWidth]="100">
+      <dxi-validation-rule type="pattern"  [pattern]="orderPattern" message="Invalid Input data"></dxi-validation-rule>
+      <dxi-validation-rule type="numeric" [max]="3" message="order must not exceed 3 characters"></dxi-validation-rule>
+    </dxi-column>      -->
+  </dx-tree-list>
+</div>
+
+
+    </div>
+  </div>
+</div>
+<div class="modal" id="Deleteuser" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{this.selectedItem.type === 'lookup' ? 'Lookup' : 'Category'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete the {{this.selectedItem.type === 'lookup' ? 'Lookup' : 'Category'}}?
+        <!-- Are you sure want to Delete User ? -->
+        <div class="clearfix"></div>
+        <div class="mt-2">
+          <button class="pull-right mb-2 btn btn-primary btncommon delete" data-dismiss="modal" (click)="deleteItem()">
+            Delete
+          </button>
+          <button class="pull-right mb-2 mr-2 btn bg-white text-primary btncancel" data-dismiss="modal">Cancel</button>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
